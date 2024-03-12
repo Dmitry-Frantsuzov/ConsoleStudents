@@ -18,7 +18,7 @@ public class Main {
                 continue;
             }
             //выполняем выбранное действие
-            STUDENT_COMMAND_HANDLER.processComand(command);
+            STUDENT_COMMAND_HANDLER.processCommand(command);
         }
     }
 
