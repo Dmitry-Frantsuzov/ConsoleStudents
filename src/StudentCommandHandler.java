@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class StudentCommandHandler {
 
     private StudentStorage studentStorage = new StudentStorage();
@@ -17,6 +19,18 @@ public class StudentCommandHandler {
                 processDeleteCommand(command);
                 break;
             }
+            case STATS_BY_COURSE -> {
+                processStatsByCourseCommand(command); //(command) не обязательный параметр
+                break;
+            }
+            case STATS_BY_CITY -> {
+                processStatsByCityCommand(command);
+                break;
+            }
+            case SEARCH -> {
+                processSearchCommand(command);
+                break;
+            }
             default -> {
                 System.out.println("Действие " + action + " не поддерживается");
             }
@@ -24,41 +38,84 @@ public class StudentCommandHandler {
         System.out.println("Обработка команды." + " действие: " + command.getAction().name() + ", данные: " + command.getData());
     }
 
+    private void processSearchCommand(Command command) {
+        String data = command.getData();
+        String[] dataArray = data.split(",");
+
+        if (data.equals("")) {
+            studentStorage.search();
+        }  else if(dataArray.length<2) {
+            String surname = dataArray[0];
+            studentStorage.search(surname);
+        }else {
+            try {
+                String firstSurname = dataArray[0];
+                String lastSurname = dataArray[1];
+                studentStorage.search(firstSurname, lastSurname);
+            } catch (Exception ex) {
+                System.out.println("Проблема обработки ввода. " + ex.getMessage());
+            }
+        }
+    }
+
+
     private void processCreateCommand(Command command) {
         String data = command.getData();
         String[] dataArray = data.split(",");
 
-        Student student = new Student();
-        student.setSurname(dataArray[0]);
-        student.setName(dataArray[1]);
-        student.setCourse(dataArray[2]);
-        student.setCity(dataArray[3]);
-        student.setAge(Integer.valueOf(dataArray[4]));
+        try {
+            Student student = new Student();
+            student.setSurname(dataArray[0]);
+            student.setName(dataArray[1]);
+            student.setCourse(dataArray[2]);
+            student.setCity(dataArray[3]);
+            student.setAge(Integer.valueOf(dataArray[4]));
 
-        studentStorage.createStudent(student);
-        studentStorage.printAll();
+            studentStorage.createStudent(student);
+            studentStorage.printAll();
+        } catch (Exception ex) {
+            System.out.println("Проблема обработки ввода. " + ex.getMessage());
+        }
     }
 
     public void processUpdateCommand(Command command) {
         String data = command.getData();
         String[] dataArray = data.split(",");
-        Long id = Long.valueOf(dataArray[0]);
 
-        Student student = new Student();
-        student.setSurname(dataArray[1]);
-        student.setName(dataArray[2]);
-        student.setCourse(dataArray[3]);
-        student.setCity(dataArray[4]);
-        student.setAge(Integer.valueOf(dataArray[5]));
+        try {
+            Long id = Long.valueOf(dataArray[0]);
+            Student student = new Student();
+            student.setSurname(dataArray[1]);
+            student.setName(dataArray[2]);
+            student.setCourse(dataArray[3]);
+            student.setCity(dataArray[4]);
+            student.setAge(Integer.valueOf(dataArray[5]));
 
-        studentStorage.updateStudent(id, student);
-        studentStorage.printAll();
+            studentStorage.updateStudent(id, student);
+            studentStorage.printAll();
+        } catch (Exception ex) {
+            System.out.println("Проблема обработки ввода. " + ex.getMessage());
+        }
     }
 
     public void processDeleteCommand(Command command) {
         String data = command.getData();
-        Long id = Long.valueOf(data);
-        studentStorage.deleteStudent(id);
-        studentStorage.printAll();
+        try {
+            Long id = Long.valueOf(data);
+            studentStorage.deleteStudent(id);
+            studentStorage.printAll();
+        } catch (Exception ex) {
+            System.out.println("Проблема обработки ввода. " + ex.getMessage());
+        }
+    }
+
+    public void processStatsByCourseCommand(Command command) {
+        Map<String, Long> data = studentStorage.getCountByCourse();
+        studentStorage.printMap(data);
+    }
+
+    public void processStatsByCityCommand(Command command) {
+        Map<String, Long> data = studentStorage.getCountByCity();
+        studentStorage.printMap(data);
     }
 }
